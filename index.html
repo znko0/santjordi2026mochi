@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Saskia vs el Dragón 🌹</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;background:#3a6b2a;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none;}
+#app{position:relative;width:420px;height:100dvh;max-height:820px;overflow:hidden;border-radius:0;}
+#c{position:absolute;top:0;left:0;width:100%;height:100%;}
+
+/* ── TÍTULO ── */
+#s-title{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:20px 24px 14px;z-index:20;background:linear-gradient(180deg,#5bb8e0 0%,#7dcfee 35%,#a8e090 100%);}
+.cloud{position:absolute;background:rgba(255,255,255,.82);border-radius:40px;filter:blur(.5px);}
+.t-char{font-size:72px;animation:bob 2.8s ease-in-out infinite;margin-bottom:12px;z-index:1;filter:drop-shadow(0 4px 10px rgba(0,0,0,.18));}
+@keyframes bob{0%,100%{transform:translateY(0)rotate(-2deg)}50%{transform:translateY(-9px)rotate(2deg)}}
+.t-main{font-family:'Cinzel',serif;font-size:21px;font-weight:700;color:#1a3a0e;text-align:center;line-height:1.55;letter-spacing:.04em;text-shadow:0 2px 0 rgba(255,255,255,.5);z-index:1;margin-bottom:4px;}
+.t-sub{font-family:'EB Garamond',serif;font-style:italic;font-size:14.5px;color:#2d5a18;margin-bottom:18px;z-index:1;}
+.t-box{font-family:'EB Garamond',serif;font-size:14px;color:#2a4a18;line-height:2.1;z-index:1;margin-bottom:20px;background:rgba(255,255,255,.5);border:1px solid rgba(60,120,20,.2);border-radius:12px;padding:12px 18px;width:100%;text-align:center;}
+.t-box b{font-weight:normal;color:#1a3a0e;font-style:italic;}
+#btn-play{font-family:'Cinzel',serif;font-size:13px;font-weight:700;letter-spacing:.1em;color:#fff;background:linear-gradient(160deg,#3a8c20,#1f5c10);border:2px solid rgba(255,255,255,.45);border-radius:50px;padding:15px 48px;cursor:pointer;z-index:1;box-shadow:0 5px 18px rgba(30,80,10,.45);transition:transform .13s;touch-action:manipulation;}
+#btn-play:active{transform:scale(.95);}
+
+/* ── HUD ── */
+#hud{position:absolute;top:0;left:0;right:0;padding:10px 13px;display:none;align-items:center;justify-content:space-between;z-index:10;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.28),transparent);}
+#hud.on{display:flex;}
+.hside{display:flex;flex-direction:column;gap:3px;}
+.hlbl{font-family:'Cinzel',serif;font-size:7px;letter-spacing:.1em;color:rgba(255,255,255,.85);text-shadow:0 1px 3px rgba(0,0,0,.6);}
+.hpbar{width:100px;height:8px;background:rgba(0,0,0,.3);border-radius:4px;overflow:hidden;border:1px solid rgba(255,255,255,.25);}
+.hpfill{height:100%;border-radius:4px;transition:width .25s;}
+.hpp{background:linear-gradient(90deg,#5dde80,#18a840);}
+.hpd{background:linear-gradient(90deg,#f87060,#dc2020);}
+.hscore{font-family:'Cinzel',serif;font-size:11px;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.6);}
+
+/* ── CONTROLES ── */
+#ctrl{position:absolute;bottom:0;left:0;right:0;height:148px;display:none;align-items:flex-end;justify-content:space-between;padding:0 16px 18px;z-index:10;pointer-events:none;}
+#ctrl.on{display:flex;}
+.cg{display:flex;gap:9px;pointer-events:all;}
+.cb{width:58px;height:58px;border-radius:50%;background:rgba(255,255,255,.22);border:2px solid rgba(255,255,255,.45);color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:none;user-select:none;transition:background .1s;box-shadow:0 3px 8px rgba(0,0,0,.2);}
+.cb.pressed,.cb:active{background:rgba(255,255,255,.42);}
+.cb-s{width:65px;height:65px;background:rgba(255,180,200,.28);border:2px solid rgba(255,200,220,.55);font-size:10px;font-family:'Cinzel',serif;color:#fff;letter-spacing:-.01em;text-align:center;line-height:1.2;padding:4px;}
+
+/* ── GAMEOVER ── */
+#s-over{position:absolute;inset:0;background:rgba(10,4,0,.9);display:none;flex-direction:column;align-items:center;justify-content:center;gap:15px;z-index:20;padding:28px;}
+#s-over.on{display:flex;}
+#s-over h2{font-family:'Cinzel',serif;font-size:20px;color:#f0a090;text-align:center;line-height:1.6;text-shadow:0 0 20px rgba(200,80,60,.4);}
+#s-over p{font-family:'EB Garamond',serif;font-style:italic;font-size:15px;color:rgba(255,255,255,.4);text-align:center;}
+.gbtn{font-family:'Cinzel',serif;font-size:12px;font-weight:600;letter-spacing:.08em;color:#ffe8d8;background:linear-gradient(135deg,#7a1a10,#b02818);border:1px solid rgba(240,120,80,.3);border-radius:50px;padding:13px 32px;cursor:pointer;transition:transform .13s;touch-action:manipulation;}
+.gbtn:active{transform:scale(.95);}
+
+/* ── WIN / CARTA ── */
+#s-win{position:absolute;inset:0;background:#f8f3ea;display:none;flex-direction:column;align-items:center;overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:20;}
+#s-win.on{display:flex;}
+.whead{width:100%;background:linear-gradient(180deg,#c0dea0 0%,#dff0c8 50%,#f0f8e8 100%);padding:22px 20px 6px;display:flex;flex-direction:column;align-items:center;gap:7px;}
+.wbadge{font-family:'Cinzel',serif;font-size:8px;font-weight:700;letter-spacing:.3em;color:#3a6018;border-top:1px solid #7aaa4488;border-bottom:1px solid #7aaa4488;padding:6px 18px;}
+.wemoji{font-size:32px;display:flex;gap:6px;}
+.wtitle{font-family:'Cinzel',serif;font-size:17px;color:#1e3a0c;font-weight:600;text-align:center;line-height:1.5;margin-bottom:4px;}
+.rose-wrap{display:flex;justify-content:center;padding:2px 0 0;width:100%;background:linear-gradient(180deg,#f0f8e8,#f8f3ea);}
+
+/* CARTA */
+.carta{margin:10px 16px 18px;background:#fdfaf3;border:1px solid #c8a850;border-radius:3px;padding:32px 26px 28px;position:relative;box-shadow:0 2px 32px rgba(0,0,0,.12),inset 0 0 40px rgba(180,140,60,.03);}
+.carta::before{content:'';position:absolute;inset:7px;border:1px solid rgba(180,140,60,.22);border-radius:2px;pointer-events:none;}
+.cc{position:absolute;font-size:12px;color:#b8860b;opacity:.5;line-height:1;}
+.cc-tl{top:11px;left:12px;}.cc-tr{top:11px;right:12px;}.cc-bl{bottom:11px;left:12px;}.cc-br{bottom:11px;right:12px;}
+.cdiv{text-align:center;color:#b8860b;opacity:.38;font-size:9px;letter-spacing:.4em;margin:11px 0;}
+.csal{font-family:'Cinzel',serif;font-size:13.5px;font-weight:600;color:#5a3010;text-align:center;margin-bottom:16px;letter-spacing:.04em;}
+.cbody{font-family:'EB Garamond',serif;font-size:16.5px;color:#1c1005;line-height:1.95;text-align:justify;}
+.cbody p{margin-bottom:12px;}.cbody p:last-child{margin-bottom:0;}
+.cbody em{color:#8b1a1a;font-style:italic;}
+.cfirma{font-family:'EB Garamond',serif;font-style:italic;font-size:16.5px;font-weight:500;color:#5a3010;text-align:right;margin-top:18px;}
+#btn-again{font-family:'Cinzel',serif;font-size:10px;font-weight:600;letter-spacing:.08em;color:#7a5820;background:transparent;border:1px solid #c8a850;border-radius:50px;padding:11px 26px;cursor:pointer;margin:0 0 28px;touch-action:manipulation;transition:background .14s;}
+#btn-again:active{background:rgba(160,110,30,.1);}
+.petal{position:absolute;top:-30px;pointer-events:none;animation:pfall linear infinite;}
+@keyframes pfall{to{transform:translateY(880px)rotate(540deg);opacity:0;}}
+</style>
+</head>
+<body>
+<div id="app">
+<canvas id="c"></canvas>
+
+<!-- HUD -->
+<div id="hud">
+  <div class="hside"><div class="hlbl">🦦 SASKIA</div><div class="hpbar"><div class="hpfill hpp" id="hpp"></div></div></div>
+  <div class="hscore" id="hsc">🌹 0</div>
+  <div class="hside" style="align-items:flex-end"><div class="hlbl" style="text-align:right">DRAGÓN 🐉</div><div class="hpbar"><div class="hpfill hpd" id="hpd" style="width:100%"></div></div></div>
+</div>
+
+<!-- Controles -->
+<div id="ctrl">
+  <div class="cg">
+    <div class="cb" id="cl">◀</div>
+    <div class="cb" id="cr">▶</div>
+  </div>
+  <div class="cg">
+    <div class="cb" id="cj">▲</div>
+    <div class="cb cb-s" id="cs">Lanzar<br>Mochi</div>
+  </div>
+</div>
+
+<!-- Título -->
+<div id="s-title">
+  <div id="clouds"></div>
+  <div class="t-char" id="title-char">🦦</div>
+  <div class="t-main">SASKIA<br>&amp; el Dragón</div>
+  <div class="t-sub">Sant Jordi · una aventura de nutria</div>
+  <div class="t-box">
+    <b>◀ ▶</b> Moverse &nbsp;·&nbsp; <b>▲</b> Saltar<br>
+    <b>Lanzar Mochi</b> — dispara mochis blanditos al dragón 🍡<br>
+    <span style="font-size:12px;color:#4a6b30;">Cuidado con el fuego… y con el dragón enfadado.</span>
+  </div>
+  <button id="btn-play">✦ &nbsp;COMENZAR&nbsp; ✦</button>
+</div>
+
+<!-- Game Over -->
+<div id="s-over">
+  <div style="font-size:60px">🐉💨</div>
+  <h2>El dragón ha<br>ganado esta vez…</h2>
+  <p>Saskia lo intentará de nuevo.</p>
+  <button class="gbtn" id="btn-retry">↺ &nbsp;Otra vez</button>
+</div>
+
+<!-- WIN + CARTA -->
+<div id="s-win">
+  <div class="whead">
+    <div class="wbadge">Sant Jordi · 23 d'abril</div>
+    <div class="wemoji">🌹 🌹 🌹</div>
+    <div class="wtitle">¡El dragón ha sido vencido!</div>
+  </div>
+
+  <!-- ROSA SVG dibujada a mano -->
+  <div class="rose-wrap">
+    <svg width="140" height="190" viewBox="0 0 140 190" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Tallo principal -->
+      <path d="M70 186 C70 172 68 152 66 132 C64 112 63 92 65 74" stroke="#2a5220" stroke-width="2.8" stroke-linecap="round"/>
+      <!-- Espinas -->
+      <path d="M66 150 C58 145 54 137 60 132" stroke="#2a5220" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+      <path d="M65 120 C73 116 78 108 72 104" stroke="#2a5220" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+      <!-- Hoja izquierda grande -->
+      <path d="M66 128 C48 118 38 102 47 88 C53 81 66 91 68 109Z" fill="#346b2a" opacity=".9"/>
+      <path d="M68 109 C66 99 65 90 68 87" stroke="#2a5220" stroke-width="1.1" stroke-linecap="round"/>
+      <!-- Hoja derecha -->
+      <path d="M65 100 C84 93 97 80 91 67 C86 61 74 70 69 87Z" fill="#346b2a" opacity=".8"/>
+      <path d="M69 87 C70 77 72 70 69 67" stroke="#2a5220" stroke-width="1.1" stroke-linecap="round"/>
+      <!-- Cáliz (sépalos) -->
+      <path d="M55 68 C55 57 63 51 70 49 C77 51 85 57 85 68 C85 74 78 76 70 76 C62 76 55 74 55 68Z" fill="#2a5220"/>
+      <path d="M54 64 C55 51 63 44 70 42" stroke="#3a7230" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M86 64 C85 51 77 44 70 42" stroke="#3a7230" stroke-width="1.8" stroke-linecap="round"/>
+      <!-- Pétalos exteriores - capa 1 -->
+      <ellipse cx="70" cy="38" rx="18" ry="26" fill="#7a1414" opacity=".78" transform="rotate(-10 70 38)"/>
+      <ellipse cx="70" cy="38" rx="18" ry="26" fill="#7a1414" opacity=".78" transform="rotate(10 70 38)"/>
+      <ellipse cx="70" cy="36" rx="16" ry="23" fill="#8b1818" opacity=".84" transform="rotate(-22 70 36)"/>
+      <ellipse cx="70" cy="36" rx="16" ry="23" fill="#8b1818" opacity=".84" transform="rotate(22 70 36)"/>
+      <!-- Pétalos medios - capa 2 -->
+      <ellipse cx="70" cy="34" rx="14" ry="20" fill="#a01c1c" transform="rotate(-8 70 34)"/>
+      <ellipse cx="70" cy="34" rx="14" ry="20" fill="#a01c1c" transform="rotate(8 70 34)"/>
+      <ellipse cx="70" cy="32" rx="12" ry="17" fill="#b82020"/>
+      <!-- Pétalos interiores - capa 3 -->
+      <ellipse cx="70" cy="30" rx="10" ry="14" fill="#c42424" transform="rotate(-5 70 30)"/>
+      <ellipse cx="70" cy="30" rx="10" ry="14" fill="#c42424" transform="rotate(5 70 30)"/>
+      <!-- Centro -->
+      <ellipse cx="70" cy="26" rx="7" ry="10" fill="#d02828"/>
+      <ellipse cx="70" cy="24" rx="5" ry="7"  fill="#d83030"/>
+      <ellipse cx="70" cy="22" rx="3" ry="4.5" fill="#e04040"/>
+      <!-- Brillo -->
+      <ellipse cx="66" cy="19" rx="2.5" ry="3.5" fill="rgba(255,200,200,.28)" transform="rotate(-15 66 19)"/>
+      <ellipse cx="64" cy="22" rx="1.5" ry="2" fill="rgba(255,220,220,.2)"/>
+    </svg>
+  </div>
+
+  <!-- LA CARTA — edita el texto aquí abajo -->
+  <div class="carta">
+    <span class="cc cc-tl">✦</span><span class="cc cc-tr">✦</span>
+    <span class="cc cc-bl">✦</span><span class="cc cc-br">✦</span>
+    <div class="csal">Para Saskia</div>
+    <div class="cdiv">— ✦ —</div>
+    <div class="cbody">
+      <p>Como manda la leyenda, hoy el dragón ha sido vencido. Pero no por un caballero con armadura — sino por una nutria con mochis y mucho amor.</p>
+      <p>Quería hacerte esto porque creo que pocas cosas me hacen tan feliz como verte reír. Y si es a costa de un dragón pixelado, mejor todavía.</p>
+      <p>Gracias por ser tan tú, Saskia. <em>Feliz Sant Jordi.</em></p>
+    </div>
+    <!-- FIRMA — cámbiala a tu gusto -->
+    <div class="cfirma">Con todo mi cariño,<br><em>Arnau</em></div>
+  </div>
+
+  <button id="btn-again">↺ &nbsp;Jugar de nuevo</button>
+</div>
+</div><!-- #app -->
+
+<script>
+/* =============================================
+   NUBES DECORATIVAS EN TÍTULO
+============================================= */
+(function(){
+  const el=document.getElementById('clouds');
+  el.style.cssText='position:absolute;inset:0;pointer-events:none;overflow:hidden;';
+  const data=[[30,60,90,30],[200,90,110,24],[320,50,80,28],[10,160,70,20],[310,180,90,22],[140,200,60,18]];
+  data.forEach(([x,y,w,h])=>{
+    const d=document.createElement('div');d.className='cloud';
+    d.style.cssText=`left:${x}px;top:${y}px;width:${w}px;height:${h}px;`;
+    el.appendChild(d);
+  });
+})();
+
+/* =============================================
+   CANVAS + JUEGO
+============================================= */
+const cv=document.getElementById('c');
+const cx=cv.getContext('2d');
+const app=document.getElementById('app');
+
+function rsz(){cv.width=app.offsetWidth;cv.height=app.offsetHeight;}
+rsz();window.addEventListener('resize',rsz);
+const W=()=>cv.width, H=()=>cv.height;
+const GROUND=()=>H()-90;
+
+/* ── Estado global ── */
+let gs='title';
+let score=0;
+let P={},D={},bullets=[],fire=[],particles=[],floaters=[],plats=[];
+let keys={},mb={L:0,R:0,J:0,S:0},jWas=0,sWas=0;
+
+/* ── MECÁNICAS EXTRA GRACIOSAS ──
+   • El dragón tiene un nombre ridículo que aparece sobre él
+   • Cuando le das, suelta corazones rotos 💔
+   • Al 50% HP el dragón se pone a LLORAR y va más rápido (enfadado)
+   • Mochis rebotan una vez en el suelo antes de desaparecer
+   • Si el dragón te da y estás en el aire, saltas un extra ("susto de nutria")
+   • Al matar el dragón, aparece un mensaje gracioso antes de la carta
+*/
+const DRAGON_NAMES=['Sr. Fueguito','Dragonàs Enfadat','Don Malaostia','Lord Flametes','Garfield el Dragó'];
+let dragonName=DRAGON_NAMES[Math.floor(Math.random()*DRAGON_NAMES.length)];
+let dragonCrying=false;
+let dragonCryTimer=0;
+let winkTimer=0; // el dragón guiña un ojo de vez en cuando
+
+/* ── Init ── */
+function init(){
+  score=0;jWas=0;sWas=0;
+  dragonCrying=false;dragonCryTimer=0;winkTimer=0;
+  dragonName=DRAGON_NAMES[Math.floor(Math.random()*DRAGON_NAMES.length)];
+  P={x:55,y:GROUND()-44,w:42,h:42,vx:0,vy:0,gr:1,hp:100,inv:0,face:1,sc:0,wink:0};
+  D={x:W()-150,y:GROUND()-80,w:90,h:90,hp:220,atk:0,dir:-1,fl:0,ph:1,sway:0,cry:0,wink:0};
+  bullets=[];fire=[];particles=[];floaters=[];
+  plats=[
+    {x:22, y:GROUND()-105,w:100,h:12,col:'#5a8c30'},
+    {x:W()/2-52,y:GROUND()-155,w:104,h:12,col:'#4a7c28'},
+    {x:W()-130,y:GROUND()-105,w:100,h:12,col:'#5a8c30'},
+    {x:W()/2-36,y:GROUND()-225,w:72,h:12,col:'#3d6e20'},
+  ];
+  gs='playing';
+  document.getElementById('hud').classList.add('on');
+  document.getElementById('ctrl').classList.add('on');
+  updHUD();
+}
+
+function updHUD(){
+  document.getElementById('hpp').style.width=Math.max(0,P.hp)+'%';
+  document.getElementById('hpd').style.width=Math.max(0,(D.hp/220)*100)+'%';
+  document.getElementById('hsc').textContent='🌹 '+score;
+}
+
+/* ── Controles teclado ── */
+document.addEventListener('keydown',e=>{keys[e.code]=1;['Space','ArrowUp','ArrowLeft','ArrowRight'].includes(e.code)&&e.preventDefault();});
+document.addEventListener('keyup',e=>{keys[e.code]=0;});
+
+/* ── Controles táctiles ── */
+function hold(id,k){
+  const el=document.getElementById(id);
+  const dn=e=>{e.preventDefault();mb[k]=1;el.classList.add('pressed');};
+  const up=e=>{e.preventDefault();mb[k]=0;el.classList.remove('pressed');};
+  ['touchstart'].forEach(ev=>el.addEventListener(ev,dn,{passive:false}));
+  ['touchend','touchcancel'].forEach(ev=>el.addEventListener(ev,up,{passive:false}));
+  el.addEventListener('mousedown',dn);
+  ['mouseup','mouseleave'].forEach(ev=>el.addEventListener(ev,up));
+}
+hold('cl','L');hold('cr','R');hold('cj','J');hold('cs','S');
+
+/* ── Partículas ── */
+function spark(x,y,col,n,vs=1){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2,sp=(Math.random()*3+1)*vs;
+    particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2,life:35+Math.random()*20,ml:55,sz:Math.random()*5+2,col,type:'dot'});
+  }
+}
+function floatMsg(x,y,txt,col='#fff'){floaters.push({x,y,txt,col,life:65,ml:65,vy:-1.2});}
+
+/* ── DIBUJADO MOCHI ──
+   Bola redonda kawaii con carita, color crema, mejillas rosadas
+*/
+function drawMochi(x,y,r,hasHeart=false,scared=false){
+  // Sombra
+  cx.save();
+  cx.globalAlpha=.15;
+  cx.fillStyle='#000';
+  cx.beginPath();cx.ellipse(x,y+r*.9,r*.8,r*.25,0,0,Math.PI*2);cx.fill();
+  cx.globalAlpha=1;
+
+  // Cuerpo principal - degradado crema
+  const bg=cx.createRadialGradient(x-r*.25,y-r*.2,r*.05,x,y,r*1.05);
+  bg.addColorStop(0,'#fdf5e0');
+  bg.addColorStop(.6,'#f5e8c0');
+  bg.addColorStop(1,'#e8d4a0');
+  cx.beginPath();cx.arc(x,y,r,0,Math.PI*2);
+  cx.fillStyle=bg;cx.fill();
+  cx.strokeStyle='#c8a858';cx.lineWidth=1.2;cx.stroke();
+
+  // Mejillas rosadas
+  cx.globalAlpha=.38;
+  cx.fillStyle='#f4a0b0';
+  cx.beginPath();cx.ellipse(x-r*.38,y+r*.08,r*.22,r*.15,-.1,0,Math.PI*2);cx.fill();
+  cx.beginPath();cx.ellipse(x+r*.38,y+r*.08,r*.22,r*.15,.1,0,Math.PI*2);cx.fill();
+  cx.globalAlpha=1;
+
+  // Ojos
+  const ey=y-r*.1;
+  if(scared){
+    // Ojos asustados — X X
+    cx.strokeStyle='#3a2000';cx.lineWidth=1.8;cx.lineCap='round';
+    [-r*.26,r*.26].forEach(ox=>{
+      cx.beginPath();cx.moveTo(x+ox-4,ey-3);cx.lineTo(x+ox+4,ey+3);cx.stroke();
+      cx.beginPath();cx.moveTo(x+ox+4,ey-3);cx.lineTo(x+ox-4,ey+3);cx.stroke();
+    });
+  } else {
+    // Ojos normales — puntitos con brillo
+    cx.fillStyle='#3a2000';
+    cx.beginPath();cx.ellipse(x-r*.26,ey,r*.1,r*.12,0,0,Math.PI*2);cx.fill();
+    cx.beginPath();cx.ellipse(x+r*.26,ey,r*.1,r*.12,0,0,Math.PI*2);cx.fill();
+    cx.fillStyle='rgba(255,255,255,.7)';
+    cx.beginPath();cx.arc(x-r*.22,ey-r*.05,r*.04,0,Math.PI*2);cx.fill();
+    cx.beginPath();cx.arc(x+r*.30,ey-r*.05,r*.04,0,Math.PI*2);cx.fill();
+  }
+
+  // Boca — sonrisa
+  cx.strokeStyle='#3a2000';cx.lineWidth=1.4;cx.lineCap='round';
+  cx.beginPath();
+  cx.moveTo(x-r*.18,y+r*.2);
+  cx.quadraticCurveTo(x,y+r*.38,x+r*.18,y+r*.2);
+  cx.stroke();
+
+  // Corazón encima si viene del jugador
+  if(hasHeart){
+    cx.font=`${r*.7}px serif`;cx.textAlign='center';cx.textBaseline='middle';
+    cx.fillText('💗',x,y-r*1.3);
+  }
+  cx.restore();
+}
+
+/* ── DIBUJADO FONDO MEDIEVAL ── */
+function drawBg(){
+  // Cielo degradado — día luminoso
+  const sky=cx.createLinearGradient(0,0,0,H()*.6);
+  sky.addColorStop(0,'#5bb8e8');sky.addColorStop(.5,'#8acfee');sky.addColorStop(1,'#b8e4f5');
+  cx.fillStyle=sky;cx.fillRect(0,0,W(),H());
+
+  // Sol
+  const sunX=W()-70,sunY=70;
+  cx.save();
+  cx.shadowColor='rgba(255,220,80,.6)';cx.shadowBlur=30;
+  cx.fillStyle='#ffe060';
+  cx.beginPath();cx.arc(sunX,sunY,28,0,Math.PI*2);cx.fill();
+  cx.fillStyle='#ffec80';
+  cx.beginPath();cx.arc(sunX,sunY,20,0,Math.PI*2);cx.fill();
+  cx.restore();
+
+  // Nubes
+  drawCloud(50,55,100);
+  drawCloud(200,40,80);
+  drawCloud(300,70,70);
+
+  // Montañas lejanas
+  cx.fillStyle='#a0c878';
+  drawMountain(0,H()*.52,160,H()*.22);
+  drawMountain(120,H()*.52,180,H()*.28);
+  drawMountain(260,H()*.52,160,H()*.24);
+  drawMountain(370,H()*.52,140,H()*.2);
+
+  // Pradera — degradado verde
+  const grass=cx.createLinearGradient(0,H()*.5,0,H());
+  grass.addColorStop(0,'#6abf40');grass.addColorStop(.3,'#52a030');grass.addColorStop(1,'#3a7820');
+  cx.fillStyle=grass;cx.fillRect(0,H()*.5,W(),H()*.5);
+
+  // Línea de hierba con pequeñas briznas
+  cx.fillStyle='#78cc48';
+  cx.fillRect(0,H()*.5,W(),8);
+  for(let gx=0;gx<W();gx+=14){
+    const h2=6+Math.sin(gx*.3)*3;
+    cx.fillStyle=Math.sin(gx)>0?'#88dd50':'#6abf40';
+    cx.fillRect(gx,H()*.5-h2,4,h2);
+  }
+
+  // Flores de fondo
+  const flowerSpots=[[30,H()*.55],[80,H()*.58],[150,H()*.54],[250,H()*.56],[340,H()*.55],[390,H()*.58]];
+  flowerSpots.forEach(([fx,fy])=>{
+    drawFlower(fx,fy,6,'#ffdd44');
+    drawFlower(fx+18,fy-5,5,'#ff8888');
+  });
+
+  // Castillo silueta al fondo
+  drawCastle(W()-110, H()*.4);
+
+  // Plataformas — con musgo y efecto de piedra
+  plats.forEach(p=>drawPlatform(p));
+
+  // Suelo detalle
+  cx.fillStyle='#3a7820';cx.fillRect(0,GROUND()+44,W(),H()-GROUND()-44);
+  cx.fillStyle='#4e9c30';cx.fillRect(0,GROUND()+42,W(),5);
+
+  // Flores en suelo
+  for(let fx=20;fx<W()-20;fx+=38){
+    drawFlower(fx,GROUND()+40,5,fx%76===20?'#ffdd44':'#ff8888');
+  }
+}
+
+function drawCloud(x,y,w){
+  cx.save();cx.globalAlpha=.82;cx.fillStyle='#fff';
+  cx.beginPath();cx.ellipse(x,y,w*.5,w*.22,0,0,Math.PI*2);cx.fill();
+  cx.beginPath();cx.ellipse(x-w*.2,y+4,w*.3,w*.18,0,0,Math.PI*2);cx.fill();
+  cx.beginPath();cx.ellipse(x+w*.2,y+4,w*.28,w*.16,0,0,Math.PI*2);cx.fill();
+  cx.beginPath();cx.ellipse(x-w*.02,y-w*.08,w*.32,w*.2,0,0,Math.PI*2);cx.fill();
+  cx.restore();
+}
+
+function drawMountain(x,baseY,w,h){
+  cx.beginPath();cx.moveTo(x,baseY);cx.lineTo(x+w/2,baseY-h);cx.lineTo(x+w,baseY);cx.closePath();
+  cx.fill();
+}
+
+function drawFlower(x,y,r,col){
+  cx.save();
+  for(let a=0;a<5;a++){
+    const px=x+Math.cos(a*1.256)*r*1.6,py=y+Math.sin(a*1.256)*r*1.6;
+    cx.fillStyle=col;cx.beginPath();cx.arc(px,py,r*.7,0,Math.PI*2);cx.fill();
+  }
+  cx.fillStyle='#ffe080';cx.beginPath();cx.arc(x,y,r*.6,0,Math.PI*2);cx.fill();
+  cx.restore();
+}
+
+function drawCastle(x,y){
+  cx.save();cx.globalAlpha=.28;cx.fillStyle='#4a6040';
+  // Torre izquierda
+  cx.fillRect(x,y,18,40);cx.fillRect(x-3,y-8,24,10);
+  [0,8,16].forEach(tx=>cx.fillRect(x-3+tx,y-12,6,6));
+  // Torre derecha
+  cx.fillRect(x+40,y,18,40);cx.fillRect(x+37,y-8,24,10);
+  [0,8,16].forEach(tx=>cx.fillRect(x+37+tx,y-12,6,6));
+  // Cuerpo central
+  cx.fillRect(x+16,y+8,26,32);
+  cx.fillStyle='#2a3828';cx.fillRect(x+24,y+22,10,18);
+  cx.restore();
+}
+
+function drawPlatform(p){
+  // Piedra
+  cx.fillStyle='#7a9050';
+  roundRect2(p.x,p.y,p.w,p.h,5);cx.fill();
+  // Musgo encima
+  cx.fillStyle='#5ab030';cx.fillRect(p.x+4,p.y+1,p.w-8,4);
+  // Textura piedra
+  cx.strokeStyle='rgba(0,0,0,.12)';cx.lineWidth=.7;
+  cx.beginPath();cx.moveTo(p.x+p.w/2,p.y+3);cx.lineTo(p.x+p.w/2,p.y+p.h);cx.stroke();
+}
+
+function roundRect2(x,y,w,h,r){
+  cx.beginPath();cx.moveTo(x+r,y);cx.lineTo(x+w-r,y);cx.quadraticCurveTo(x+w,y,x+w,y+r);
+  cx.lineTo(x+w,y+h-r);cx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);cx.lineTo(x+r,y+h);
+  cx.quadraticCurveTo(x,y+h,x,y+h-r);cx.lineTo(x,y+r);cx.quadraticCurveTo(x,y,x+r,y);cx.closePath();
+}
+
+/* ── DIBUJADO NUTRIA JUGADORA ── */
+function drawPlayer(){
+  if(P.inv>0&&Math.floor(P.inv/4)%2===0)return;
+  cx.save();
+  cx.translate(P.x+P.w/2,P.y+P.h/2);cx.scale(P.face,1);
+  cx.font=`${P.h*1.15}px serif`;cx.textAlign='center';cx.textBaseline='middle';
+  cx.fillText('🦦',0,0);
+  cx.restore();
+}
+
+/* ── DIBUJADO DRAGÓN ── */
+function drawDragon(){
+  cx.save();
+  const dx=D.x+D.w/2, dy=D.y+D.h/2;
+  cx.translate(dx,dy);
+  if(D.sway)cx.rotate(Math.sin(Date.now()*.02)*.06);
+  if(D.fl>0){cx.filter='brightness(2.8) saturate(2)';D.fl--;}
+  cx.font=`${D.h*1.15}px serif`;cx.textAlign='center';cx.textBaseline='middle';
+  cx.fillText('🐉',0,0);
+
+  // Si está llorando, añade lagrimitas
+  if(dragonCrying){
+    cx.font='16px serif';
+    cx.fillText('😭',0,-D.h*.55);
+    cx.fillText('💧',D.w*.35,0);cx.fillText('💧',-D.w*.35,0);
+  }
+  cx.restore();
+
+  // Nombre del dragón encima
+  cx.save();
+  cx.font='bold 10px Cinzel,serif';cx.fillStyle='rgba(255,80,60,.9)';cx.textAlign='center';
+  cx.shadowColor='rgba(0,0,0,.5)';cx.shadowBlur=4;
+  cx.fillText(dragonName,D.x+D.w/2,D.y-22);
+  cx.restore();
+
+  // Mini barra HP
+  const bw=72,bh=6,bx=D.x+(D.w-bw)/2,by=D.y-14;
+  cx.fillStyle='rgba(0,0,0,.35)';roundRect2(bx,by,bw,bh,3);cx.fill();
+  const r=Math.max(0,D.hp/220);
+  cx.fillStyle=r>.6?'#4ade80':r>.3?'#fbbf24':'#f87171';
+  roundRect2(bx,by,bw*r,bh,3);cx.fill();
+}
+
+/* ── UPDATE ── */
+function update(){
+  if(gs!=='playing')return;
+
+  const L=keys['ArrowLeft']||keys['KeyA']||mb.L;
+  const R=keys['ArrowRight']||keys['KeyD']||mb.R;
+  const J=keys['ArrowUp']||keys['Space']||mb.J;
+  const S=keys['KeyZ']||keys['KeyX']||mb.S;
+
+  // Mov
+  if(L){P.vx=-3.6;P.face=-1;}else if(R){P.vx=3.6;P.face=1;}else P.vx*=.68;
+  // Salto
+  if(J&&!jWas&&P.gr){P.vy=-13.5;P.gr=0;spark(P.x+P.w/2,P.y+P.h,'#c8e880',5);}
+  jWas=J;
+  P.vy+=.56;P.x+=P.vx;P.y+=P.vy;
+  if(P.x<0)P.x=0;if(P.x+P.w>W())P.x=W()-P.w;
+  P.gr=0;
+  if(P.y+P.h>=GROUND()+42){P.y=GROUND()+42-P.h;P.vy=0;P.gr=1;}
+  plats.forEach(p=>{
+    if(P.x<p.x+p.w&&P.x+P.w>p.x&&P.y+P.h>p.y&&P.y+P.h<p.y+p.h+14&&P.vy>=0){P.y=p.y-P.h;P.vy=0;P.gr=1;}
+  });
+  if(P.inv>0)P.inv--;
+
+  // Disparo MOCHI
+  if(P.sc>0)P.sc--;
+  if(S&&!sWas&&P.sc===0){
+    bullets.push({
+      x:P.x+(P.face>0?P.w:0),y:P.y+P.h*.35,
+      vx:P.face*8.5,vy:-1,
+      life:70,bounced:0,gy:0
+    });
+    P.sc=22;
+    // Efecto de lanzamiento
+    floatMsg(P.x+P.w/2,P.y-5,'¡Mochi!','#f0d060');
+    spark(P.x+P.w/2,P.y+P.h*.3,'#f5e8b0',4);
+  }
+  sWas=S;
+
+  // IA dragón
+  const ratio=D.hp/220;
+  // Cambio de fase a 50% — se pone a llorar (más rápido, más frecuente)
+  if(ratio<.5&&!dragonCrying){
+    dragonCrying=true;
+    floatMsg(D.x+D.w/2,D.y-30,'¡INJUSTO! 😭','#f0a080');
+  }
+  if(ratio<.25&&D.ph!==3){D.ph=3;spark(D.x+D.w/2,D.y+D.h/2,'#ef4444',22,1.5);floatMsg(D.x+D.w/2,D.y-30,'¡RABIA!!🔥','#ff6040');}
+  else if(ratio<.52&&D.ph===1)D.ph=2;
+
+  const spd=D.ph===3?2.6:D.ph===2?1.9:1.2;
+  D.x+=D.dir*spd;
+  if(D.x<W()/2-10)D.dir=1;if(D.x+D.w>W()-6)D.dir=-1;
+  D.y=GROUND()-76+Math.sin(Date.now()/750)*18;
+
+  // Guiño del dragón de vez en cuando (mecánica graciosa)
+  winkTimer++;
+  if(winkTimer>380&&!dragonCrying){winkTimer=0;floatMsg(D.x+D.w/2,D.y-30,'😏','#fff');}
+
+  // Ataques
+  const acd=D.ph===3?40:D.ph===2?58:78;
+  D.atk++;
+  if(D.atk>=acd){
+    D.atk=0;
+    const shots=D.ph===3?4:D.ph===2?2:1;
+    for(let i=0;i<shots;i++){
+      const dx=P.x-D.x,dy=P.y-D.y,len=Math.sqrt(dx*dx+dy*dy)||1;
+      const sp=(i-(shots-1)/2)*.4;
+      fire.push({x:D.x+D.w*.3,y:D.y+D.h*.5,vx:(dx/len)*5.5+sp,vy:(dy/len)*5.5+sp,life:65,sz:14+Math.random()*5});
+    }
+  }
+
+  // Balas mochi — rebotan
+  bullets=bullets.filter(b=>{
+    b.x+=b.vx;b.y+=b.vy;b.vy+=.35;b.life--;
+    // Rebote en suelo / plataforma
+    if(!b.bounced&&b.y+10>=GROUND()+42){b.y=GROUND()+42-10;b.vy*=-.55;b.vx*=.8;b.bounced=1;}
+    plats.forEach(p=>{
+      if(!b.bounced&&b.x>p.x&&b.x<p.x+p.w&&b.y+10>p.y&&b.y+10<p.y+p.h+10&&b.vy>0){
+        b.y=p.y-10;b.vy*=-.5;b.bounced=1;
+      }
+    });
+    // Golpe al dragón
+    if(b.x>D.x&&b.x<D.x+D.w&&b.y>D.y&&b.y<D.y+D.h){
+      const dmg=7+Math.floor(Math.random()*7);
+      D.hp-=dmg;D.fl=7;
+      floatMsg(D.x+D.w/2,D.y-10,'💔 -'+dmg,'#f08080');
+      spark(b.x,b.y,'#f5c0a0',8);
+      score+=10;updHUD();
+      if(D.hp<=0){D.hp=0;setTimeout(triggerWin,450);}
+      return false;
+    }
+    return b.life>0&&b.x>-20&&b.x<W()+20;
+  });
+
+  // Fuego dragón
+  fire=fire.filter(f=>{
+    f.x+=f.vx;f.y+=f.vy;f.vy+=.09;f.life--;
+    if(P.inv===0&&f.x>P.x&&f.x<P.x+P.w&&f.y>P.y&&f.y<P.y+P.h){
+      P.hp-=12;P.inv=65;
+      // Susto de nutria — pequeño saltito
+      if(!P.gr)P.vy=Math.min(P.vy,-3);
+      spark(P.x+P.w/2,P.y+P.h/2,'#fbbf24',9);
+      floatMsg(P.x+P.w/2,P.y-5,'¡AU!','#fff');
+      updHUD();
+      if(P.hp<=0){P.hp=0;setTimeout(triggerOver,320);}
+      return false;
+    }
+    return f.life>0;
+  });
+
+  particles=particles.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.1;p.life--;return p.life>0;});
+  floaters=floaters.filter(f=>{f.y+=f.vy;f.life--;return f.life>0;});
+}
+
+/* ── RENDER ── */
+function render(){
+  cx.clearRect(0,0,W(),H());
+  drawBg();
+  if(gs!=='playing')return;
+
+  // Partículas
+  particles.forEach(p=>{
+    cx.globalAlpha=p.life/p.ml;cx.fillStyle=p.col;
+    cx.beginPath();cx.arc(p.x,p.y,p.sz*(p.life/p.ml),0,Math.PI*2);cx.fill();cx.globalAlpha=1;
+  });
+
+  // Floaters
+  floaters.forEach(f=>{
+    cx.save();cx.globalAlpha=Math.min(1,f.life/f.ml*2);
+    cx.font='bold 13px Cinzel,serif';cx.fillStyle=f.col;cx.textAlign='center';
+    cx.shadowColor='rgba(0,0,0,.4)';cx.shadowBlur=4;
+    cx.fillText(f.txt,f.x,f.y);cx.restore();
+  });
+
+  // Fuego dragón
+  fire.forEach(f=>{
+    cx.font=`${f.sz}px serif`;cx.textAlign='center';cx.textBaseline='middle';
+    cx.fillText('🔥',f.x,f.y);
+  });
+
+  // Balas — mochis dibujados
+  bullets.forEach(b=>{drawMochi(b.x,b.y,10,true,b.bounced>0);});
+
+  drawDragon();
+  drawPlayer();
+}
+
+/* ── TRANSICIONES ── */
+function triggerWin(){
+  gs='win';
+  document.getElementById('hud').classList.remove('on');
+  document.getElementById('ctrl').classList.remove('on');
+  const sw=document.getElementById('s-win');sw.classList.add('on');sw.scrollTop=0;
+  spawnPetals();
+}
+function triggerOver(){
+  gs='over';
+  document.getElementById('hud').classList.remove('on');
+  document.getElementById('ctrl').classList.remove('on');
+  document.getElementById('s-over').classList.add('on');
+}
+
+function spawnPetals(){
+  const sw=document.getElementById('s-win');
+  ['🌹','🌸','🌺'].forEach((em,ei)=>{
+    for(let i=0;i<7;i++){
+      const el=document.createElement('div');el.className='petal';
+      el.textContent=em;
+      el.style.cssText=`left:${Math.random()*100}%;font-size:${13+Math.random()*9}px;animation-duration:${3.5+Math.random()*3.5}s;animation-delay:${Math.random()*2.5+ei*.3}s`;
+      sw.appendChild(el);
+    }
+  });
+}
+
+/* ── BOTONES ── */
+document.getElementById('btn-play').onclick=()=>{
+  document.getElementById('s-title').style.display='none';init();};
+document.getElementById('btn-retry').onclick=()=>{
+  document.getElementById('s-over').classList.remove('on');init();};
+document.getElementById('btn-again').onclick=()=>{
+  document.querySelectorAll('.petal').forEach(e=>e.remove());
+  document.getElementById('s-win').classList.remove('on');
+  document.getElementById('s-title').style.display='flex';gs='title';};
+
+/* ── LOOP ── */
+(function loop(){update();render();requestAnimationFrame(loop);})();
+</script>
+</body>
+</html>
